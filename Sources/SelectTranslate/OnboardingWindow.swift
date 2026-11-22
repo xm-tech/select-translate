@@ -47,7 +47,7 @@ final class OnboardingWindow: NSWindow {
         laterButton.target = self
         laterButton.action = #selector(dismissTapped)
 
-        for view in [titleLabel, bodyLabel, statusLabel, openButton, laterButton] {
+        for view in [titleLabel, bodyLabel, statusLabel, openButton, laterButton] as [NSView] {
             contentView?.addSubview(view)
         }
 

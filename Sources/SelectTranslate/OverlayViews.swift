@@ -274,7 +274,7 @@ final class ResultCardView: NSView {
         copyButton.onClick = { [weak self] in self?.copyTranslated() }
         retryButton.onClick = { [weak self] in self?.onRetry?() }
 
-        for view in [titleLabel, directionLabel, appNameLabel, closeButton, separator, scrollView, spinner, statusLabel, providerLabel, copyButton, retryButton] {
+        for view in [titleLabel, directionLabel, appNameLabel, closeButton, separator, scrollView, spinner, statusLabel, providerLabel, copyButton, retryButton] as [NSView] {
             addSubview(view)
         }
     }
