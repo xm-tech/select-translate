@@ -33,7 +33,7 @@ macOS 菜单栏小工具：**在任何 App 里选中文字 → 选区下方浮�
 
 ### 方式一：下载现成的 App（推荐给普通用户）
 
-去 [Releases](https://github.com/xm-tech/select-translate/releases) 下载最新的 `SelectTranslate-vX.Y.zip`，
+去 [Releases](https://github.com/xm-tech/select-translate/releases) 下载最新的 `SelectTranslate-1.1.zip`（以后版本号会变），
 解压后把 `SelectTranslate.app` 拖进「应用程序」（或 `~/Applications`）。
 
 这个 App 是 **ad-hoc 签名**（没有 Apple 开发者证书），所以第一次打开可能提示「无法验证开发者」：
