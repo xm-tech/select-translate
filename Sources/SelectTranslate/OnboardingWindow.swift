@@ -59,7 +59,17 @@ final class OnboardingWindow: NSWindow {
             attributes: [.font: NSFont.systemFont(ofSize: 13)]
         ).height
 
-        let totalHeight = 28 + 26 + 14 + ceil(bodyHeight) + 18 + 18 + 24 + 32 + 26
+        // 拆成多步累加：单个长表达式在旧版 Swift 编译器下会触发 type-check 超时
+        let bodyHeightRounded = ceil(bodyHeight)
+        var totalHeight: CGFloat = 28
+        totalHeight += 26
+        totalHeight += 14
+        totalHeight += bodyHeightRounded
+        totalHeight += 18
+        totalHeight += 18
+        totalHeight += 24
+        totalHeight += 32
+        totalHeight += 26
         setContentSize(NSSize(width: 560, height: totalHeight))
 
         guard let content = contentView else { return }
@@ -68,9 +78,9 @@ final class OnboardingWindow: NSWindow {
         titleLabel.frame = NSRect(x: horizontalPadding, y: top - 26, width: bodyWidth, height: 26)
         top -= 26 + 14
 
-        bodyLabel.frame = NSRect(x: horizontalPadding, y: top - ceil(bodyHeight), width: bodyWidth, height: ceil(bodyHeight))
+        bodyLabel.frame = NSRect(x: horizontalPadding, y: top - bodyHeightRounded, width: bodyWidth, height: bodyHeightRounded)
         bodyLabel.preferredMaxLayoutWidth = bodyWidth
-        top -= ceil(bodyHeight) + 18
+        top -= bodyHeightRounded + 18
 
         statusLabel.frame = NSRect(x: horizontalPadding, y: top - 18, width: bodyWidth, height: 18)
         top -= 18 + 24
