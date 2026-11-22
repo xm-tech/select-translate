@@ -26,6 +26,20 @@ enum ProviderChoice: String, CaseIterable {
         case .google: return "Google"
         }
     }
+
+    /// 当前构建是否包含 Apple 本地翻译（取决于编译时 SDK 是否 >= macOS 26）。
+    var isSupportedInThisBuild: Bool {
+        switch self {
+        case .apple:
+#if NO_APPLE_TRANSLATION
+            return false
+#else
+            return true
+#endif
+        default:
+            return true
+        }
+    }
 }
 
 /// 翻译方向。`.auto` 会根据选中的文字自动判断是中译英还是英译中。

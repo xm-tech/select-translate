@@ -3,7 +3,9 @@ import AppKit
 final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
     private var statusItem: NSStatusItem?
     private var onboarding: OnboardingWindow?
+#if !NO_APPLE_TRANSLATION
     private var appleLanguageWindow: NSWindow?
+#endif
     private var permissionTimer: Timer?
     private let selectionService = SelectionService()
     private let menu = NSMenu()
@@ -28,9 +30,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
             showOnboarding()
             startPermissionWatch()
         }
+#if !NO_APPLE_TRANSLATION
         if CommandLine.arguments.contains("--applepack") {
             showAppleLanguagePack()
         }
+#endif
         Log.info("launched trusted=\(selectionService.isTrusted) log=\(Log.path ?? "nil")")
     }
 
@@ -102,7 +106,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
 
         let providerRoot = NSMenuItem(title: "翻译服务", action: nil, keyEquivalent: "")
         let providerMenu = NSMenu()
-        for choice in ProviderChoice.allCases {
+        for choice in ProviderChoice.allCases where choice.isSupportedInThisBuild {
             let item = NSMenuItem(title: choice.displayName,
                                   action: #selector(selectProvider(_:)),
                                   keyEquivalent: "")
@@ -111,12 +115,14 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
             item.state = Settings.provider == choice ? .on : .off
             providerMenu.addItem(item)
         }
+#if !NO_APPLE_TRANSLATION
         providerMenu.addItem(.separator())
         let applePackItem = NSMenuItem(title: "下载 Apple 本地语言包…",
                                        action: #selector(showAppleLanguagePack),
                                        keyEquivalent: "")
         applePackItem.target = self
         providerMenu.addItem(applePackItem)
+#endif
         providerRoot.submenu = providerMenu
         menu.addItem(providerRoot)
 
@@ -196,6 +202,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         selectionService.promptForPermission()
     }
 
+#if !NO_APPLE_TRANSLATION
     @objc private func showAppleLanguagePack() {
         guard #available(macOS 26.0, *) else {
             presentAlert(title: "系统版本过低", message: "Apple 本地翻译需要 macOS 26 及以上系统。")
@@ -206,6 +213,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         NSApp.activate(ignoringOtherApps: true)
         window.makeKeyAndOrderFront(nil)
     }
+#endif
 
     @objc private func openLog() {
         Log.configureDefault()
@@ -288,12 +296,16 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
                 lines.append("当前选区：未检测到")
             }
 
+#if NO_APPLE_TRANSLATION
+            lines.append("Apple 本地翻译：当前构建未包含（编译时 SDK 低于 macOS 26）")
+#else
             if #available(macOS 26.0, *) {
                 lines.append("Apple 本地翻译 英→中：\(await AppleTranslator.statusDescription(for: .enToZh))")
                 lines.append("Apple 本地翻译 中→英：\(await AppleTranslator.statusDescription(for: .zhToEn))")
             } else {
                 lines.append("Apple 本地翻译：需要 macOS 26 及以上")
             }
+#endif
 
             for kind in [ProviderChoice.tencent, .mymemory] {
                 do {

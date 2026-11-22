@@ -56,9 +56,11 @@ final class Translator {
         switch preferred {
         case .auto:
             var chain: [ProviderKind] = []
+#if !NO_APPLE_TRANSLATION
             if #available(macOS 26.0, *), await AppleTranslator.isInstalled(for: direction) {
                 chain.append(.apple)
             }
+#endif
             chain.append(contentsOf: [.tencent, .mymemory, .google])
             order = chain
         case .apple: order = [.apple]
@@ -116,10 +118,14 @@ enum ProviderKind {
     func translate(_ text: String, session: URLSession, direction: TranslationDirection) async throws -> String {
         switch self {
         case .apple:
+#if NO_APPLE_TRANSLATION
+            throw ProviderError(message: "当前构建未包含 Apple 本地翻译（编译时 SDK 低于 macOS 26）")
+#else
             if #available(macOS 26.0, *) {
                 return try await AppleTranslator.translate(text, direction: direction)
             }
             throw ProviderError(message: "需要 macOS 26 及以上系统")
+#endif
         case .tencent:
             return try await translateInChunks(text, limit: 1800) { chunk in
                 try await Self.tencent(chunk, session: session, direction: direction)

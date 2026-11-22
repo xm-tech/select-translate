@@ -3,22 +3,24 @@ name: build
 on:
   push:
     branches: [main]
-    tags: ['v*']
   pull_request:
   workflow_dispatch:
 
 jobs:
   build:
-    # 需要 arm64 的 macOS runner：scripts/build.sh 交叉编译到 arm64-apple-macos13.0
-    runs-on: macos-15-intel   # x86_64 runner：账户里 arm64 runner 不可用，用交叉编译出 arm64 产物
+    # 账户里没有 arm64 的 macos-14/15 runner，这里用 x86_64 的 macos-15-intel 交叉编译 arm64。
+    # 该镜像的 SDK 是 macOS 15，低于 Apple 本地翻译所需的 26，因此 build.sh 会自动跳过
+    # Apple 翻译模块（-DNO_APPLE_TRANSLATION）——这里只验证「其余代码能编译、能打包」。
+    # 正式 Release 由维护者在 macOS 26+ SDK 的机器上构建后手动发布。
+    runs-on: macos-15-intel
     steps:
       - uses: actions/checkout@v4
 
       - name: 环境信息
         run: |
           sw_vers
+          xcrun --sdk macosx --show-sdk-version
           xcrun swiftc --version
-          uname -m
 
       - name: 构建 App
         run: ./scripts/build.sh
@@ -28,18 +30,9 @@ jobs:
           APP="dist/SelectTranslate.app"
           test -x "$APP/Contents/MacOS/SelectTranslate"
           /usr/libexec/PlistBuddy -c "Print :CFBundleIdentifier" "$APP/Contents/Info.plist"
+          /usr/libexec/PlistBuddy -c "Print :CFBundleShortVersionString" "$APP/Contents/Info.plist"
           codesign --verify --verbose=2 "$APP"
-          echo "== 自检（翻译链路，需要网络）=="
-          "$APP/Contents/MacOS/SelectTranslate" --selftest || echo "跳过的自检（网络不可用时不阻塞构建）"
+          file "$APP/Contents/MacOS/SelectTranslate"
 
-      - name: 打包
-        run: |
-          mkdir -p out
-          ditto -c -k --sequesterRsrc --keepParent dist/SelectTranslate.app out/SelectTranslate.app.zip
-          shasum -a 256 out/SelectTranslate.app.zip > out/SelectTranslate.app.zip.sha256
-          cat out/SelectTranslate.app.zip.sha256
-
-      - uses: actions/upload-artifact@v4
-        with:
-          name: SelectTranslate-app
-          path: out/*
+      - name: 冒烟（翻译链路，需要网络）
+        run: "./dist/SelectTranslate.app/Contents/MacOS/SelectTranslate --selftest" || echo "网络不可用，跳过冒烟"

@@ -18,10 +18,12 @@ if arguments.contains("--axtest") {
     exit(0)
 }
 
+#if !NO_APPLE_TRANSLATION
 if arguments.contains("--appletest") {
     SelfTest.runAppleTranslationTest()
     exit(0)
 }
+#endif
 
 if let index = arguments.firstIndex(of: "--icon"), index + 1 < arguments.count {
     let path = arguments[index + 1]

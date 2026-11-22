@@ -132,6 +132,9 @@ cd select-translate        # 仓库根目录
 # 所以 `swift build` 会失败；scripts/build.sh 直接调用 swiftc 并指定
 # -module-cache-path .tmp/modcache，这是唯一受支持的构建路径。
 
+# 构建脚本会检查 SDK 版本：低于 macOS 26 时自动跳过 Apple 本地翻译模块
+# （-DNO_APPLE_TRANSLATION），其余功能照常构建，适合只有 Xcode 15/16 的机器。
+
 # 命令行自测
 dist/SelectTranslate.app/Contents/MacOS/SelectTranslate --selftest   # 三个翻译服务 + 长文分块
 dist/SelectTranslate.app/Contents/MacOS/SelectTranslate --axtest     # 打印当前选区读取结果

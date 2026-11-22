@@ -197,6 +197,7 @@ enum SelfTest {
     // MARK: - Apple 本地翻译探针
 
     /// `--appletest`：打印 Apple 本地翻译的语言包状态，已安装则实测一句。
+#if !NO_APPLE_TRANSLATION
     static func runAppleTranslationTest() {
         let app = NSApplication.shared
         app.setActivationPolicy(.accessory)
@@ -242,4 +243,5 @@ enum SelfTest {
 
         app.run()
     }
+#endif
 }
