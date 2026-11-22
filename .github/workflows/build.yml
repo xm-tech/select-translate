@@ -10,7 +10,7 @@ on:
 jobs:
   build:
     # 需要 arm64 的 macOS runner：scripts/build.sh 交叉编译到 arm64-apple-macos13.0
-    runs-on: macos-13
+    runs-on: macos-15-intel   # x86_64 runner：账户里 arm64 runner 不可用，用交叉编译出 arm64 产物
     steps:
       - uses: actions/checkout@v4
 

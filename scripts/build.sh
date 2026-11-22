@@ -12,12 +12,13 @@ TMP="$ROOT/.tmp"
 CACHE="$TMP/modcache"
 SOURCES="$ROOT/Sources/SelectTranslate"
 VERSION="${VERSION:-1.1}"
+TARGET_ARCH="${TARGET_ARCH:-arm64}"
 
 mkdir -p "$TMP" "$CACHE"
 
 echo "==> 编译 Swift 源码"
 swiftc -O -swift-version 5 \
-  -target arm64-apple-macos13.0 \
+  -target "$TARGET_ARCH-apple-macos13.0" \
   -module-cache-path "$CACHE" \
   "$SOURCES"/*.swift \
   -o "$TMP/$APP_NAME"

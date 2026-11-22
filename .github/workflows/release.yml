@@ -9,7 +9,7 @@ permissions:
 
 jobs:
   release:
-    runs-on: macos-13
+    runs-on: macos-15-intel   # x86_64 runner：账户里 arm64 runner 不可用，用交叉编译出 arm64 产物
     steps:
       - uses: actions/checkout@v4
 
