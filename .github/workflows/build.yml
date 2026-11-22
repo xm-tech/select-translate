@@ -35,4 +35,5 @@ jobs:
           file "$APP/Contents/MacOS/SelectTranslate"
 
       - name: 冒烟（翻译链路，需要网络）
-        run: "./dist/SelectTranslate.app/Contents/MacOS/SelectTranslate --selftest" || echo "网络不可用，跳过冒烟"
+        run: |
+          ./dist/SelectTranslate.app/Contents/MacOS/SelectTranslate --selftest || echo "网络不可用，跳过冒烟"
