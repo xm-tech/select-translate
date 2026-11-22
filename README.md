@@ -64,6 +64,8 @@ cd select-translate        # 仓库根目录
 
 ### 划词不出按钮？（更新后最常见）
 
+> 用 `make setup` 更新的话会自动处理，不需要手动操作。
+
 现象：菜单栏图标在，但选中文字不弹「译」，日志 `~/Library/Logs/SelectTranslate.log` 里是 `launched trusted=false`。
 
 原因：ad-hoc 签名每次构建 cdhash 都会变，系统设置里那一行**看起来还是开启的，其实已经失效**——单纯关掉再打开开关也没用。
@@ -122,11 +124,43 @@ cd select-translate        # 仓库根目录
 
 ---
 
+## 常用命令（Makefile）
+
+```bash
+make            # 列出所有命令
+make setup      # 构建 + 安装到 ~/Applications + 自动修复辅助功能授权（更新时用这个）
+make doctor     # 检查 SDK 版本、安装位置、当前授权状态
+make logs       # 实时跟踪日志
+make test       # 翻译链路自测 + 中英两套端到端用例
+```
+
+常用目标：
+
+| 命令 | 作用 |
+| --- | --- |
+| `make setup` | `install` + `regrant`，一条命令完成更新并恢复授权 |
+| `make build` / `make install` | 只编译 / 编译并安装启动 |
+| `make regrant` | 重新授予辅助功能权限（重签名后必跑） |
+| `make run` / `make stop` / `make logs` | 启动 / 退出 / 看日志 |
+| `make doctor` | 环境与授权自检 |
+| `make selftest` | 命令行测腾讯 / MyMemory / Google（中英双向） |
+| `make appletest` | Apple 本地翻译状态与耗时 |
+| `make axtest` | 打印当前前台 App 的选区信息（排查读不到选区） |
+| `make snapshot` | 渲染结果卡片截图到 `.tmp/snap` |
+| `make e2e` / `make e2e-zh` | TextEdit 英文 / 中文端到端用例 |
+| `make test` | `selftest` + 两套 `e2e` |
+| `make release` | 打 `SelectTranslate-<版本>.zip` + sha256 |
+| `make clean` | 清理 `dist/`、`.tmp/`、`.build/` |
+
+变量可覆盖：`make release VERSION=1.2`、`make build TARGET_ARCH=x86_64`。
+
 ## 开发
 
 ```bash
 ./scripts/build.sh          # swiftc 编译 + 生成图标 + 打包 + ad-hoc 签名
 ./scripts/install.sh        # build.sh + 安装到 ~/Applications + 启动
+./scripts/regrant.sh        # 重新授权辅助功能（每次重新构建后都要跑）
+```
 
 # 本机是纯 Command Line Tools 环境，且沙箱禁止写 /var/folders 下的默认模块缓存，
 # 所以 `swift build` 会失败；scripts/build.sh 直接调用 swiftc 并指定

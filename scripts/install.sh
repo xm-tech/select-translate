@@ -18,6 +18,15 @@ rm -rf "$TARGET"
 cp -R "$SOURCE" "$TARGET"
 
 echo "==> 启动"
-open "$TARGET"
+# 刚替换过 .app 时 LaunchServices 偶尔会返回 -600（procNotFound），重试几次即可
+launched=0
+for _ in 1 2 3 4 5; do
+  if open "$TARGET" 2>/dev/null; then launched=1; break; fi
+  sleep 1
+done
+if [ "$launched" -ne 1 ]; then
+  echo "    启动失败，请手动打开：$TARGET" >&2
+  exit 1
+fi
 echo "==> 已安装并启动：$TARGET"
 echo "    首次运行需要在「系统设置 › 隐私与安全性 › 辅助功能」里勾选「划词翻译」。"

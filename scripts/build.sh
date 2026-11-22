@@ -19,11 +19,11 @@ mkdir -p "$TMP" "$CACHE"
 echo "==> 检查 SDK 版本"
 SDK_VERSION="$(xcrun --sdk macosx --show-sdk-version)"
 SDK_MAJOR="${SDK_VERSION%%.*}"
-NO_APPLE_FLAGS=()
+APPLE_DEFINE=""
 SOURCE_FILES=("$SOURCES"/*.swift)
 if [ "${SDK_MAJOR}" -lt 26 ]; then
   echo "    当前 SDK 为 ${SDK_VERSION}（< 26），跳过 Apple 本地翻译模块"
-  NO_APPLE_FLAGS=(-DNO_APPLE_TRANSLATION)
+  APPLE_DEFINE="-DNO_APPLE_TRANSLATION"
   SOURCE_FILES=()
   for f in "$SOURCES"/*.swift; do
     case "$(basename "$f")" in
@@ -39,7 +39,7 @@ echo "==> 编译 Swift 源码"
 swiftc -O -swift-version 5 \
   -target "$TARGET_ARCH-apple-macos13.0" \
   -module-cache-path "$CACHE" \
-  "${NO_APPLE_FLAGS[@]}" \
+  ${APPLE_DEFINE} \
   "${SOURCE_FILES[@]}" \
   -o "$TMP/$APP_NAME"
 
