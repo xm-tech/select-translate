@@ -1,5 +1,9 @@
 # 划词翻译（SelectTranslate）
 
+[![build](https://github.com/xm-tech/select-translate/actions/workflows/build.yml/badge.svg)](https://github.com/xm-tech/select-translate/actions/workflows/build.yml)
+[![release](https://img.shields.io/github/v/release/xm-tech/select-translate?include_prereleases&sort=semver)](https://github.com/xm-tech/select-translate/releases)
+[![license](https://img.shields.io/github/license/xm-tech/select-translate)](LICENSE)
+
 macOS 菜单栏小工具：**在任何 App 里选中文字 → 选区下方浮出「译」按钮 → 点击 → 弹出翻译卡片**。
 点卡片右上角 ✕、按 Esc、或点任何其他地方都会收起卡片。
 
@@ -26,6 +30,20 @@ macOS 菜单栏小工具：**在任何 App 里选中文字 → 选区下方浮�
 ---
 
 ## 安装
+
+### 方式一：下载现成的 App（推荐给普通用户）
+
+去 [Releases](https://github.com/xm-tech/select-translate/releases) 下载最新的 `SelectTranslate-vX.Y.zip`，
+解压后把 `SelectTranslate.app` 拖进「应用程序」（或 `~/Applications`）。
+
+这个 App 是 **ad-hoc 签名**（没有 Apple 开发者证书），所以第一次打开可能提示「无法验证开发者」：
+
+- 在 Finder 里 **右键 → 打开**，再确认一次；或
+- 终端执行 `xattr -dr com.apple.quarantine SelectTranslate.app` 后双击
+
+打开后照旧要在「系统设置 → 隐私与安全性 → 辅助功能」里勾选它。
+
+### 方式二：从源码构建
 
 ```bash
 cd select-translate        # 仓库根目录

@@ -1,0 +1,36 @@
+name: release
+
+on:
+  push:
+    tags: ['v*']
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: macos-14
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: 构建 App
+        run: ./scripts/build.sh
+
+      - name: 打包
+        run: |
+          ditto -c -k --sequesterRsrc --keepParent dist/SelectTranslate.app "SelectTranslate-${GITHUB_REF_NAME}.zip"
+          shasum -a 256 "SelectTranslate-${GITHUB_REF_NAME}.zip" > "SelectTranslate-${GITHUB_REF_NAME}.zip.sha256"
+
+      - name: 发布
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release create "${GITHUB_REF_NAME}" \
+            "SelectTranslate-${GITHUB_REF_NAME}.zip" \
+            "SelectTranslate-${GITHUB_REF_NAME}.zip.sha256" \
+            --title "划词翻译 ${GITHUB_REF_NAME}" \
+            --notes "构建自 $(git rev-parse --short HEAD)。
+
+          下载后解压到「应用程序」（或 ~/Applications），首次打开若提示「无法验证开发者」：
+          右键 → 打开，或执行 \`xattr -dr com.apple.quarantine SelectTranslate.app\`。
+          首次运行还需要在「系统设置 → 隐私与安全性 → 辅助功能」里授权。"
